@@ -1,15 +1,26 @@
 package ch.heigvd.iict.and.rest.viewmodels
 
+import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import ch.heigvd.iict.and.rest.ContactsRepository
+import ch.heigvd.iict.and.rest.models.Contact
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ContactsViewModel(private val repository: ContactsRepository) : ViewModel() {
 
     val allContacts = repository.allContacts
+
+    fun getContactById(id: Long): LiveData<Contact?> {
+        return repository.getContactById(id)
+    }
+
+    fun test(): String {
+        return "test"
+    }
 
     // actions
     fun enroll() {

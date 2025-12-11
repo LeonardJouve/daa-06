@@ -27,7 +27,7 @@ interface ContactsDao {
     fun getAllContacts() : List<Contact>
 
     @Query("SELECT * FROM Contact WHERE id = :id")
-    fun getContactById(id : Long) : Contact?
+    fun getContactById(id : Long) : LiveData<Contact?>
 
     @Query("SELECT COUNT(*) FROM Contact")
     fun getCount() : Int

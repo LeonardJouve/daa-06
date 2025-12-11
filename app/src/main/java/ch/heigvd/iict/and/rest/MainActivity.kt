@@ -1,5 +1,6 @@
 package ch.heigvd.iict.and.rest
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -43,6 +44,9 @@ class MainActivity : AppCompatActivity() {
         binding.mainFabNew.setOnClickListener {
             // FIXME - create a new contact
             Toast.makeText(this, "TODO - Création d'un nouveau contact", Toast.LENGTH_SHORT).show()
+
+            val intent = Intent(this, UpsertContact::class.java)
+            startActivity(intent)
         }
     }
 

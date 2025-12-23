@@ -10,39 +10,228 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:id="@+id/contact_form_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/main_base_barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="end"
+            app:barrierMargin="10dp"
+            app:constraint_referenced_ids="name_label,firstname_label,email_label,birthday_label,address_label,zip_label,city_label,phone_type_label,phone_label"/>
 
-    <TextView
-        android:id="@+id/name_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/contact_form_title"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/name_input"
-        android:text="@string/fragment_name_subtitle"
-        />
+        <TextView
+            android:id="@+id/contact_form_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
-    <EditText
-        android:id="@+id/name_input"
-        app:layout_constraintStart_toEndOf="@id/name_label"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/contact_form_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="@string/fragment_name_subtitle"
-        />
+        <TextView
+            android:id="@+id/name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/contact_form_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBaseline_toBaselineOf="@id/name_input"
+            android:text="@string/fragment_name_subtitle"
+            />
+        <EditText
+            android:id="@+id/name_input"
+            app:layout_constraintStart_toEndOf="@id/main_base_barrier"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/contact_form_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:hint="@string/fragment_name_subtitle"
+            />
+
+        <TextView
+            android:id="@+id/firstname_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/name_input"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBaseline_toBaselineOf="@id/firstname_input"
+            android:text="@string/fragment_firstname_subtitle"
+            />
+        <EditText
+            android:id="@+id/firstname_input"
+            app:layout_constraintStart_toEndOf="@id/main_base_barrier"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/name_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:hint="@string/fragment_firstname_subtitle"
+            />
+
+        <TextView
+            android:id="@+id/email_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/firstname_input"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBaseline_toBaselineOf="@id/email_input"
+            android:text="@string/fragment_email_subtitle" />
+        <EditText
+            android:id="@+id/email_input"
+            app:layout_constraintStart_toEndOf="@id/main_base_barrier"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/firstname_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:hint="@string/fragment_email_subtitle" />
+
+        <TextView
+            android:id="@+id/birthday_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/email_input"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBaseline_toBaselineOf="@id/birthday_input"
+            android:text="@string/fragment_birthday_subtitle" />
+        <EditText
+            android:id="@+id/birthday_input"
+            app:layout_constraintStart_toEndOf="@id/main_base_barrier"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/email_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="date"
+            android:enabled="false"
+            android:hint="@string/fragment_birthday_subtitle" />
+
+        <TextView
+            android:id="@+id/address_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/birthday_input"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBaseline_toBaselineOf="@id/address_input"
+            android:text="@string/fragment_address_subtitle" />
+        <EditText
+            android:id="@+id/address_input"
+            app:layout_constraintStart_toEndOf="@id/main_base_barrier"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/birthday_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="textPostalAddress"
+            android:hint="@string/fragment_address_subtitle" />
+
+        <TextView
+            android:id="@+id/zip_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/address_input"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBaseline_toBaselineOf="@id/zip_input"
+            android:text="@string/fragment_zip_subtitle" />
+        <EditText
+            android:id="@+id/zip_input"
+            app:layout_constraintStart_toEndOf="@id/main_base_barrier"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="@string/fragment_zip_subtitle" />
+
+        <TextView
+            android:id="@+id/city_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/zip_input"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBaseline_toBaselineOf="@id/city_input"
+            android:text="@string/fragment_city_subtitle" />
+        <EditText
+            android:id="@+id/city_input"
+            app:layout_constraintStart_toEndOf="@id/main_base_barrier"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/zip_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="textPostalAddress"
+            android:hint="@string/fragment_city_subtitle" />
+
+        <TextView
+            android:id="@+id/phone_type_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/city_input"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="@string/fragment_phonetype_subtitle" />
+        <RadioGroup
+            android:id="@+id/phone_type_radio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/phone_type_label">
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fragment_phonetype_home"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fragment_phonetype_mobile"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fragment_phonetype_office"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fragment_phonetype_fax"/>
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/phone_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/phone_type_radio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBaseline_toBaselineOf="@id/phone_input"
+            android:text="@string/fragment_phonenumber_subtitle" />
+        <EditText
+            android:id="@+id/phone_input"
+            app:layout_constraintStart_toEndOf="@id/main_base_barrier"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/phone_type_radio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="phone"
+            android:hint="@string/fragment_phonenumber_subtitle" />
 
         <Button
+            android:id="@+id/cancel_button"
+            app:layout_constraintTop_toBottomOf="@+id/phone_input"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/fragment_btn_cancel"
+            android:textColor="#FFFFFF"/>
+        <Button
+            android:id="@+id/delete_button"
+            android:text="@string/fragment_btn_delete"
+            app:layout_constraintTop_toBottomOf="@+id/phone_input"
+            app:layout_constraintStart_toEndOf="@id/cancel_button"
+            app:layout_constraintEnd_toStartOf="@id/upsert_button"
+            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:drawableEnd="@drawable/delete"
+            android:drawableTint="#FFFFFF"
+            android:textColor="#FFFFFF"/>
+        <Button
             android:id="@+id/upsert_button"
-            app:layout_constraintTop_toBottomOf="@+id/name_input"
+            app:layout_constraintTop_toBottomOf="@+id/phone_input"
             app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="10dp"
              android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:drawableEnd="@drawable/save"

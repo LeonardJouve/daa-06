@@ -41,9 +41,11 @@ class ContactFormFragment : Fragment() {
 
     fun setupView() {
         if (contact.value == null) {
+            binding.deleteButton.visibility = View.GONE;
             binding.contactFormTitle.text = getString(R.string.fragment_detail_title_new)
             binding.upsertButton.text = getString(R.string.fragment_btn_create)
         } else {
+            binding.deleteButton.visibility = View.VISIBLE;
             binding.contactFormTitle.text = getString(R.string.fragment_detail_title_edit)
             binding.upsertButton.text = getString(R.string.fragment_btn_save)
         }
@@ -59,6 +61,10 @@ class ContactFormFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.cancelButton.setOnClickListener {
+            requireActivity().finish()
+        }
 
         contact = if (contactId == -1L)
             MutableLiveData<Contact?>(null)

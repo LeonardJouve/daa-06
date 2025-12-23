@@ -171,18 +171,22 @@
             android:orientation="horizontal"
             app:layout_constraintTop_toBottomOf="@id/phone_type_label">
             <RadioButton
+                android:id="@+id/home_radio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/fragment_phonetype_home"/>
             <RadioButton
+                android:id="@+id/mobile_radio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/fragment_phonetype_mobile"/>
             <RadioButton
+                android:id="@+id/office_radio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/fragment_phonetype_office"/>
             <RadioButton
+                android:id="@+id/fax_radio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/fragment_phonetype_fax"/>

@@ -14,8 +14,11 @@ import ch.heigvd.iict.and.rest.R
 import ch.heigvd.iict.and.rest.UpsertContact
 import ch.heigvd.iict.and.rest.databinding.FragmentContactFormBinding
 import ch.heigvd.iict.and.rest.models.Contact
+import ch.heigvd.iict.and.rest.models.PhoneType
 import ch.heigvd.iict.and.rest.viewmodels.ContactsViewModel
 import ch.heigvd.iict.and.rest.viewmodels.ContactsViewModelFactory
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 /**
@@ -41,13 +44,31 @@ class ContactFormFragment : Fragment() {
 
     fun setupView() {
         if (contact.value == null) {
-            binding.deleteButton.visibility = View.GONE;
+            binding.deleteButton.visibility = View.GONE
             binding.contactFormTitle.text = getString(R.string.fragment_detail_title_new)
             binding.upsertButton.text = getString(R.string.fragment_btn_create)
         } else {
-            binding.deleteButton.visibility = View.VISIBLE;
+            binding.deleteButton.visibility = View.VISIBLE
             binding.contactFormTitle.text = getString(R.string.fragment_detail_title_edit)
             binding.upsertButton.text = getString(R.string.fragment_btn_save)
+
+            binding.nameInput.setText(contact.value?.name)
+            binding.firstnameInput.setText(contact.value?.firstname)
+            binding.emailInput.setText(contact.value?.email)
+            contact.value?.birthday?.time?.let {
+                binding.birthdayInput.setText(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it))
+            }
+            binding.addressInput.setText(contact.value?.address)
+            binding.zipInput.setText(contact.value?.zip)
+            binding.cityInput.setText(contact.value?.city)
+            when (contact.value?.type) {
+                PhoneType.HOME -> binding.homeRadio.isChecked = true
+                PhoneType.FAX -> binding.faxRadio.isChecked = true
+                PhoneType.MOBILE -> binding.mobileRadio.isChecked = true
+                PhoneType.OFFICE -> binding.officeRadio.isChecked = true
+                else -> {}
+            }
+            binding.phoneInput.setText(contact.value?.phoneNumber)
         }
     }
 

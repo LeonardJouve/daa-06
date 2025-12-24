@@ -1,22 +1,13 @@
 package ch.heigvd.iict.and.rest
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import ch.heigvd.iict.and.rest.fragments.ContactFormFragment
-import ch.heigvd.iict.and.rest.viewmodels.ContactsViewModel
-import ch.heigvd.iict.and.rest.viewmodels.ContactsViewModelFactory
-import kotlin.getValue
 
 class UpsertContact : AppCompatActivity() {
-    private val contactsViewModel: ContactsViewModel by viewModels {
-        ContactsViewModelFactory((application as ContactsApplication).repository)
-    }
-
     companion object {
         val CONTACT_ID_KEY = "contact_id"
     }

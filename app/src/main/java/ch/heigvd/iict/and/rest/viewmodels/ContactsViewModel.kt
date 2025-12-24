@@ -1,10 +1,12 @@
 package ch.heigvd.iict.and.rest.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import ch.heigvd.iict.and.rest.ContactsRepository
+import ch.heigvd.iict.and.rest.SessionManager
 import ch.heigvd.iict.and.rest.models.Contact
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -19,13 +21,14 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
-class ContactsViewModel(private val repository: ContactsRepository) : ViewModel() {
+class ContactsViewModel(private val repository: ContactsRepository, private val sessionManager: SessionManager) : ViewModel() {
 
     val allContacts = repository.allContacts
-    var sessionId: String? = null
+    var sessionId: String? = sessionManager.getSession()
     val baseURL = "https://daa.iict.ch"
 
     private val ktorClient = HttpClient(Android) {
@@ -49,13 +52,10 @@ class ContactsViewModel(private val repository: ContactsRepository) : ViewModel(
             .body()
     }
 
-    private suspend fun requestContacts(): List<Contact> {
-        return sendSessionRequest<List<Contact>, Unit>(HttpMethod.Get, "/contacts")
-    }
-
     private suspend inline fun <reified T, U>sendSessionRequest(method: HttpMethod, endpoint: String, payload: U? = null): T {
         if (sessionId == null) {
             sessionId = requestSessionId()
+            sessionManager.saveSession(sessionId!!)
         }
 
         return ktorClient.request(baseURL + endpoint) {
@@ -72,38 +72,49 @@ class ContactsViewModel(private val repository: ContactsRepository) : ViewModel(
         return repository.getContactById(id)
     }
 
-    fun test(): String {
-        return "test"
-    }
-
     // actions
-
-    fun setContacts() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val contacts = requestContacts()
+    fun enroll(): Job {
+        return viewModelScope.launch(Dispatchers.IO) {
+            sessionId = requestSessionId()
+            sessionManager.saveSession(sessionId!!)
+            val contacts = sendSessionRequest<List<Contact>, Unit>(HttpMethod.Get, "/contacts")
             repository.setContacts(contacts)
         }
     }
 
-    fun enroll() {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun refresh(): Job {
+        return viewModelScope.launch(Dispatchers.IO) {
             // TODO
         }
     }
 
-    fun refresh() {
-        viewModelScope.launch(Dispatchers.IO) {
-            // TODO
+    fun create(contact: Contact): Job {
+        return viewModelScope.launch(Dispatchers.IO) {
+            val dbContact = sendSessionRequest<Contact, Contact>(HttpMethod.Post, "/contacts/", contact)
+            repository.addContact(dbContact)
         }
     }
 
+    fun update(contact: Contact): Job {
+        return viewModelScope.launch(Dispatchers.IO) {
+            val dbContact = sendSessionRequest<Contact, Contact>(HttpMethod.Put, "/contacts/" + contact.id, contact)
+            repository.updateContact(dbContact)
+        }
+    }
+
+    fun delete(contact: Contact): Job {
+        return viewModelScope.launch(Dispatchers.IO) {
+            sendSessionRequest<Unit, Unit>(HttpMethod.Delete, "/contacts/" + contact.id)
+            repository.deleteContact(contact)
+        }
+    }
 }
 
-class ContactsViewModelFactory(private val repository: ContactsRepository) : ViewModelProvider.Factory {
+class ContactsViewModelFactory(private val repository: ContactsRepository, private val sessionManager: SessionManager) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ContactsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return ContactsViewModel(repository) as T
+            return ContactsViewModel(repository, sessionManager) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

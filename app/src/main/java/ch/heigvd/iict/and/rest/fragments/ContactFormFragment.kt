@@ -18,6 +18,7 @@ import ch.heigvd.iict.and.rest.models.PhoneType
 import ch.heigvd.iict.and.rest.viewmodels.ContactsViewModel
 import ch.heigvd.iict.and.rest.viewmodels.ContactsViewModelFactory
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 
@@ -28,7 +29,7 @@ import java.util.Locale
  */
 class ContactFormFragment : Fragment() {
     private val contactViewModel: ContactsViewModel by activityViewModels {
-        ContactsViewModelFactory((requireActivity().application as ContactsApplication).repository)
+        ContactsViewModelFactory((requireActivity().application as ContactsApplication).repository, (requireActivity().application as ContactsApplication).sessionManager)
     }
 
     private var contactId: Long = -1
@@ -85,6 +86,42 @@ class ContactFormFragment : Fragment() {
 
         binding.cancelButton.setOnClickListener {
             requireActivity().finish()
+        }
+
+        binding.deleteButton.setOnClickListener {
+            contact.value?.let {
+                contactViewModel.delete(it).invokeOnCompletion {
+                    requireActivity().finish()
+                }
+            }
+        }
+
+        binding.upsertButton.setOnClickListener {
+            val newContact = Contact(
+                id = contact.value?.id,
+                name = binding.nameInput.text.toString(),
+                firstname = binding.firstnameInput.text.toString(),
+                birthday = if (contact.value == null) Calendar.getInstance() else contact.value!!.birthday,
+                email = binding.emailInput.text.toString(),
+                address = binding.addressInput.text.toString(),
+                zip = binding.zipInput.text.toString(),
+                city = binding.cityInput.text.toString(),
+                type = when {
+                    binding.homeRadio.isChecked -> PhoneType.HOME
+                    binding.faxRadio.isChecked -> PhoneType.FAX
+                    binding.mobileRadio.isChecked -> PhoneType.MOBILE
+                    binding.officeRadio.isChecked -> PhoneType.OFFICE
+                    else -> throw IllegalStateException("No phone type selected")
+                },
+                phoneNumber = binding.phoneInput.text.toString(),
+            )
+
+            val job = if (contact.value == null) contactViewModel.create(newContact)
+                else contactViewModel.update(newContact)
+
+            job.invokeOnCompletion {
+                requireActivity().finish()
+            }
         }
 
         contact = if (contactId == -1L)

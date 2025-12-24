@@ -7,4 +7,5 @@ class ContactsApplication : Application() {
 
     private val database by lazy { ContactsDatabase.getDatabase(this) }
     val repository by lazy { ContactsRepository(database.contactsDao()) }
+    val sessionManager by lazy { SessionManager(this) }
 }

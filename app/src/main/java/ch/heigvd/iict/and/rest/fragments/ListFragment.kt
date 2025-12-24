@@ -20,7 +20,7 @@ class ListFragment : Fragment() {
     private lateinit var binding : FragmentListBinding
 
     private val contactsViewModel: ContactsViewModel by activityViewModels {
-        ContactsViewModelFactory(((requireActivity().application as ContactsApplication).repository))
+        ContactsViewModelFactory((requireActivity().application as ContactsApplication).repository, (requireActivity().application as ContactsApplication).sessionManager)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -30,8 +30,6 @@ class ListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        contactsViewModel.setContacts()
 
         val adapter = ContactsAdapter(emptyList()) { _, _, _, id ->
             // we locate the contact to edit

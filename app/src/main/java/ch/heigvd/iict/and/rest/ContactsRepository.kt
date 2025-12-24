@@ -16,6 +16,18 @@ class ContactsRepository(private val contactsDao: ContactsDao) {
         contactsDao.setContacts(contacts)
     }
 
+    fun addContact(contact: Contact) {
+        contactsDao.insert(contact)
+    }
+
+    fun updateContact(contact: Contact) {
+        contactsDao.update(contact)
+    }
+
+    fun deleteContact(contact: Contact) {
+        contactsDao.delete(contact)
+    }
+
     companion object {
         private val TAG = "ContactsRepository"
     }

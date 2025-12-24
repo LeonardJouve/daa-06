@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import ch.heigvd.iict.and.rest.models.Contact
 
@@ -13,6 +14,15 @@ interface ContactsDao {
 
     @Insert
     fun insert(contact: Contact) : Long
+
+    @Insert()
+    fun insertAll(contacts: List<Contact>)
+
+    @Transaction
+    fun setContacts(contacts: List<Contact>) {
+        clearAllContacts()
+        insertAll(contacts)
+    }
 
     @Update
     fun update(contact: Contact)

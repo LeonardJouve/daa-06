@@ -3,7 +3,6 @@ package ch.heigvd.iict.and.rest
 import androidx.lifecycle.LiveData
 import ch.heigvd.iict.and.rest.database.ContactsDao
 import ch.heigvd.iict.and.rest.models.Contact
-import kotlin.concurrent.thread
 
 class ContactsRepository(private val contactsDao: ContactsDao) {
 
@@ -11,6 +10,10 @@ class ContactsRepository(private val contactsDao: ContactsDao) {
 
     fun getContactById(id: Long): LiveData<Contact?> {
         return contactsDao.getContactById(id)
+    }
+
+    fun setContacts(contacts: List<Contact>) {
+        contactsDao.setContacts(contacts)
     }
 
     companion object {

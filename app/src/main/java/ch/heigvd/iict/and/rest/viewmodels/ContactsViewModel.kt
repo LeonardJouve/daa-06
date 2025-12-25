@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import ch.heigvd.iict.and.rest.ContactsRepository
 import ch.heigvd.iict.and.rest.SessionManager
 import ch.heigvd.iict.and.rest.models.Contact
+import ch.heigvd.iict.and.rest.models.SyncContact
+import ch.heigvd.iict.and.rest.models.SyncStatus
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.android.Android
@@ -19,11 +21,13 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import java.io.IOException
 
 class ContactsViewModel(private val repository: ContactsRepository, private val sessionManager: SessionManager) : ViewModel() {
 
@@ -58,54 +62,82 @@ class ContactsViewModel(private val repository: ContactsRepository, private val 
             sessionManager.saveSession(sessionId!!)
         }
 
-        return ktorClient.request(baseURL + endpoint) {
+        val response = ktorClient.request(baseURL + endpoint) {
             this.method = method
             header("X-UUID", sessionId!!)
             if (payload != null) {
                 contentType(ContentType.Application.Json)
                 setBody(payload)
             }
-        }.body<T>()
+        }
+
+        if (!response.status.isSuccess()) {
+            throw IOException("Request failed with status ${response.status}")
+        }
+
+        return response.body<T>()
     }
 
-    fun getContactById(id: Long): LiveData<Contact?> {
+    fun getContactById(id: Long): LiveData<SyncContact?> {
         return repository.getContactById(id)
     }
 
     // actions
     fun enroll(): Job {
         return viewModelScope.launch(Dispatchers.IO) {
-            sessionId = requestSessionId()
-            sessionManager.saveSession(sessionId!!)
-            val contacts = sendSessionRequest<List<Contact>, Unit>(HttpMethod.Get, "/contacts")
-            repository.setContacts(contacts)
+            try {
+                sessionId = requestSessionId()
+                sessionManager.saveSession(sessionId!!)
+                val contacts = sendSessionRequest<List<Contact>, Unit>(HttpMethod.Get, "/contacts")
+                repository.setContacts(contacts)
+            } catch (e: IOException) {}
         }
+    }
+
+    private suspend fun sync(contact: SyncContact) {
+        try {
+            when (contact.status) {
+                SyncStatus.CREATED -> {
+                    val dbContact = sendSessionRequest<Contact, Contact>(HttpMethod.Post, "/contacts", contact.contact)
+                    repository.syncContact(SyncContact(contact.syncId, SyncStatus.OK, dbContact))
+                }
+                SyncStatus.MODIFIED -> {
+                    val dbContact = sendSessionRequest<Contact, Contact>(HttpMethod.Put, "/contacts/" + contact.contact.id, contact.contact)
+                    repository.syncContact(SyncContact(contact.syncId, SyncStatus.OK, dbContact))
+                }
+                SyncStatus.DELETED -> {
+                    sendSessionRequest<Unit, Unit>(HttpMethod.Delete, "/contacts/" + contact.contact.id)
+                    repository.hardDeleteContact(contact)
+                }
+                SyncStatus.OK -> {}
+            }
+        } catch (e: IOException) {}
     }
 
     fun refresh(): Job {
         return viewModelScope.launch(Dispatchers.IO) {
-            // TODO
+            repository.unsynced().forEach { sync(it) }
         }
     }
 
     fun create(contact: Contact): Job {
         return viewModelScope.launch(Dispatchers.IO) {
-            val dbContact = sendSessionRequest<Contact, Contact>(HttpMethod.Post, "/contacts/", contact)
-            repository.addContact(dbContact)
+            val id = repository.softInsertContact(contact)
+            sync(SyncContact(id, SyncStatus.CREATED, contact))
         }
     }
 
-    fun update(contact: Contact): Job {
+    fun update(contact: SyncContact): Job {
         return viewModelScope.launch(Dispatchers.IO) {
-            val dbContact = sendSessionRequest<Contact, Contact>(HttpMethod.Put, "/contacts/" + contact.id, contact)
-            repository.updateContact(dbContact)
+            repository.softUpdateContact(contact)
+            sync(SyncContact(contact.syncId, SyncStatus.MODIFIED, contact.contact))
         }
     }
 
-    fun delete(contact: Contact): Job {
+    fun delete(contact: SyncContact): Job {
         return viewModelScope.launch(Dispatchers.IO) {
-            sendSessionRequest<Unit, Unit>(HttpMethod.Delete, "/contacts/" + contact.id)
-            repository.deleteContact(contact)
+            repository.softDeleteContact(contact)
+            sync(SyncContact(contact.syncId, SyncStatus.DELETED, contact.contact))
         }
     }
 }

@@ -1,7 +1,9 @@
 package ch.heigvd.iict.and.rest.models
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -31,6 +33,14 @@ object CalendarSerializer : KSerializer<Calendar> {
     }
 }
 
+class SyncStatusConverter {
+    @TypeConverter
+    fun fromStatus(value: SyncStatus): String = value.name
+
+    @TypeConverter
+    fun toStatus(value: String): SyncStatus = SyncStatus.valueOf(value)
+}
+
 @Serializable
 @Entity
 data class Contact(@PrimaryKey(autoGenerate = true) var id: Long? = null,
@@ -44,3 +54,19 @@ data class Contact(@PrimaryKey(autoGenerate = true) var id: Long? = null,
               var city: String?,
               var type: PhoneType?,
               var phoneNumber: String?)
+
+enum class SyncStatus {
+    OK,
+    MODIFIED,
+    CREATED,
+    DELETED,
+}
+
+@Entity
+data class SyncContact(
+    @PrimaryKey(autoGenerate = true)
+    var syncId: Long? = null,
+    var status: SyncStatus,
+    @Embedded
+    var contact: Contact,
+)

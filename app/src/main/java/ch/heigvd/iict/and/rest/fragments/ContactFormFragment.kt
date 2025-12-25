@@ -15,6 +15,8 @@ import ch.heigvd.iict.and.rest.UpsertContact
 import ch.heigvd.iict.and.rest.databinding.FragmentContactFormBinding
 import ch.heigvd.iict.and.rest.models.Contact
 import ch.heigvd.iict.and.rest.models.PhoneType
+import ch.heigvd.iict.and.rest.models.SyncContact
+import ch.heigvd.iict.and.rest.models.SyncStatus
 import ch.heigvd.iict.and.rest.viewmodels.ContactsViewModel
 import ch.heigvd.iict.and.rest.viewmodels.ContactsViewModelFactory
 import java.text.SimpleDateFormat
@@ -33,7 +35,7 @@ class ContactFormFragment : Fragment() {
     }
 
     private var contactId: Long = -1
-    private lateinit var contact: LiveData<Contact?>
+    private lateinit var contact: LiveData<SyncContact?>
 
     private lateinit var binding : FragmentContactFormBinding
 
@@ -49,27 +51,29 @@ class ContactFormFragment : Fragment() {
             binding.contactFormTitle.text = getString(R.string.fragment_detail_title_new)
             binding.upsertButton.text = getString(R.string.fragment_btn_create)
         } else {
+            val contact = contact.value!!.contact
+
             binding.deleteButton.visibility = View.VISIBLE
             binding.contactFormTitle.text = getString(R.string.fragment_detail_title_edit)
             binding.upsertButton.text = getString(R.string.fragment_btn_save)
 
-            binding.nameInput.setText(contact.value?.name)
-            binding.firstnameInput.setText(contact.value?.firstname)
-            binding.emailInput.setText(contact.value?.email)
-            contact.value?.birthday?.time?.let {
+            binding.nameInput.setText(contact.name)
+            binding.firstnameInput.setText(contact.firstname)
+            binding.emailInput.setText(contact.email)
+            contact.birthday?.time.let {
                 binding.birthdayInput.setText(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it))
             }
-            binding.addressInput.setText(contact.value?.address)
-            binding.zipInput.setText(contact.value?.zip)
-            binding.cityInput.setText(contact.value?.city)
-            when (contact.value?.type) {
+            binding.addressInput.setText(contact.address)
+            binding.zipInput.setText(contact.zip)
+            binding.cityInput.setText(contact.city)
+            when (contact.type) {
                 PhoneType.HOME -> binding.homeRadio.isChecked = true
                 PhoneType.FAX -> binding.faxRadio.isChecked = true
                 PhoneType.MOBILE -> binding.mobileRadio.isChecked = true
                 PhoneType.OFFICE -> binding.officeRadio.isChecked = true
                 else -> {}
             }
-            binding.phoneInput.setText(contact.value?.phoneNumber)
+            binding.phoneInput.setText(contact.phoneNumber)
         }
     }
 
@@ -98,10 +102,10 @@ class ContactFormFragment : Fragment() {
 
         binding.upsertButton.setOnClickListener {
             val newContact = Contact(
-                id = contact.value?.id,
+                id = contact.value?.contact?.id,
                 name = binding.nameInput.text.toString(),
                 firstname = binding.firstnameInput.text.toString(),
-                birthday = if (contact.value == null) Calendar.getInstance() else contact.value!!.birthday,
+                birthday = contact.value?.contact?.birthday ?: Calendar.getInstance(),
                 email = binding.emailInput.text.toString(),
                 address = binding.addressInput.text.toString(),
                 zip = binding.zipInput.text.toString(),
@@ -111,13 +115,14 @@ class ContactFormFragment : Fragment() {
                     binding.faxRadio.isChecked -> PhoneType.FAX
                     binding.mobileRadio.isChecked -> PhoneType.MOBILE
                     binding.officeRadio.isChecked -> PhoneType.OFFICE
-                    else -> throw IllegalStateException("No phone type selected")
+                    else -> null
                 },
                 phoneNumber = binding.phoneInput.text.toString(),
             )
 
-            val job = if (contact.value == null) contactViewModel.create(newContact)
-                else contactViewModel.update(newContact)
+            val job = if (contact.value == null)
+                contactViewModel.create(newContact)
+                else contactViewModel.update(SyncContact(contact.value!!.syncId, SyncStatus.MODIFIED, newContact))
 
             job.invokeOnCompletion {
                 requireActivity().finish()
@@ -125,13 +130,10 @@ class ContactFormFragment : Fragment() {
         }
 
         contact = if (contactId == -1L)
-            MutableLiveData<Contact?>(null)
+            MutableLiveData<SyncContact?>(null)
             else contactViewModel.getContactById(contactId)
 
-        contact.observe(viewLifecycleOwner, { contact ->
-            setupView()
-            Toast.makeText(requireActivity(), contact.toString(), Toast.LENGTH_LONG).show()
-        })
+        contact.observe(viewLifecycleOwner, { setupView() })
     }
 
         companion object {

@@ -34,16 +34,11 @@ class ListFragment : Fragment() {
         val adapter = ContactsAdapter(emptyList()) { _, _, _, id ->
             // we locate the contact to edit
             if(contactsViewModel.allContacts.value != null) {
-                val selectedContact = contactsViewModel.allContacts.value!!.find { it.id == id }
+                val selectedContact = contactsViewModel.allContacts.value!!.find { it.syncId == id }
                 if(selectedContact != null) {
-                    //FIXME - user clicks on selectedContact, we want to edit it
-                    Toast.makeText(requireActivity(), "TODO - Edition de ${selectedContact.firstname} ${selectedContact.name}", Toast.LENGTH_SHORT).show()
-
-
                     val intent = Intent(requireActivity(), UpsertContact::class.java)
-                    intent.putExtra(UpsertContact.CONTACT_ID_KEY, selectedContact.id)
+                    intent.putExtra(UpsertContact.CONTACT_ID_KEY, selectedContact.syncId)
                     startActivity(intent)
-
                 }
             }
         }

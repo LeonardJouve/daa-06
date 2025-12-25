@@ -7,42 +7,45 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import ch.heigvd.iict.and.rest.models.Contact
+import ch.heigvd.iict.and.rest.models.SyncContact
+import ch.heigvd.iict.and.rest.models.SyncStatus
 
 @Dao
 interface ContactsDao {
 
     @Insert
-    fun insert(contact: Contact) : Long
+    fun insert(contact: SyncContact) : Long
 
     @Insert()
-    fun insertAll(contacts: List<Contact>)
+    fun insertAll(contacts: List<SyncContact>)
 
     @Transaction
-    fun setContacts(contacts: List<Contact>) {
+    fun setContacts(contacts: List<SyncContact>) {
         clearAllContacts()
         insertAll(contacts)
     }
 
     @Update
-    fun update(contact: Contact)
+    fun update(contact: SyncContact)
 
     @Delete
-    fun delete(contact: Contact)
+    fun delete(contact: SyncContact)
 
-    @Query("SELECT * FROM Contact")
-    fun getAllContactsLiveData() : LiveData<List<Contact>>
+    @Query("SELECT * FROM SyncContact")
+    fun getAllContactsLiveData() : LiveData<List<SyncContact>>
 
-    @Query("SELECT * FROM Contact")
-    fun getAllContacts() : List<Contact>
+    @Query("SELECT * FROM SyncContact")
+    fun getAllContacts() : List<SyncContact>
 
-    @Query("SELECT * FROM Contact WHERE id = :id")
-    fun getContactById(id : Long) : LiveData<Contact?>
+    @Query("SELECT * FROM SyncContact WHERE syncId = :id")
+    fun getContactById(id : Long) : LiveData<SyncContact?>
 
-    @Query("SELECT COUNT(*) FROM Contact")
+    @Query("SELECT COUNT(*) FROM SyncContact")
     fun getCount() : Int
 
-    @Query("DELETE FROM Contact")
+    @Query("DELETE FROM SyncContact")
     fun clearAllContacts()
 
+    @Query("SELECT * FROM SyncContact WHERE status != 'OK'")
+    fun getUnsynced(): List<SyncContact>
 }

@@ -42,9 +42,6 @@ class MainActivity : AppCompatActivity() {
 
         // contenu
         binding.mainFabNew.setOnClickListener {
-            // FIXME - create a new contact
-            Toast.makeText(this, "TODO - Création d'un nouveau contact", Toast.LENGTH_SHORT).show()
-
             val intent = Intent(this, UpsertContact::class.java)
             startActivity(intent)
         }

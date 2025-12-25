@@ -130,14 +130,18 @@ class ContactsViewModel(private val repository: ContactsRepository, private val 
     fun update(contact: SyncContact): Job {
         return viewModelScope.launch(Dispatchers.IO) {
             repository.softUpdateContact(contact)
-            sync(SyncContact(contact.syncId, if (contact.status == SyncStatus.CREATED) SyncStatus.MODIFIED else SyncStatus.MODIFIED, contact.contact))
+            sync(SyncContact(contact.syncId, if (contact.status == SyncStatus.CREATED) SyncStatus.CREATED else SyncStatus.MODIFIED, contact.contact))
         }
     }
 
     fun delete(contact: SyncContact): Job {
         return viewModelScope.launch(Dispatchers.IO) {
-            repository.softDeleteContact(contact)
-            sync(SyncContact(contact.syncId, SyncStatus.DELETED, contact.contact))
+            if (contact.status == SyncStatus.CREATED) {
+                repository.hardDeleteContact(contact)
+            } else {
+                repository.softDeleteContact(contact)
+                sync(SyncContact(contact.syncId, SyncStatus.DELETED, contact.contact))
+            }
         }
     }
 }

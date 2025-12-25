@@ -122,7 +122,7 @@ class ContactFormFragment : Fragment() {
 
             val job = if (contact.value == null)
                 contactViewModel.create(newContact)
-                else contactViewModel.update(SyncContact(contact.value!!.syncId, SyncStatus.MODIFIED, newContact))
+                else contactViewModel.update(SyncContact(contact.value!!.syncId, contact.value!!.status, newContact))
 
             job.invokeOnCompletion {
                 requireActivity().finish()

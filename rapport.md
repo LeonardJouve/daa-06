@@ -27,6 +27,7 @@ La méthode `update` met à jour un contact existant, lui ajoute l'état UPDATED
 Nous avons pris la décision de garder l'état CREATED si le contact n'avais toujours pas pu être synchronisé avec le serveur afin de permettre la modification de contact non-synchronisé.
 
 La méthode `delete` ajoute l'état DELETED à un contact existant dans la base de données et tente de le synchroniser avec le serveur.
+Nous avons pris la décision de supprimer complètement le contact de la base de données si il n'avais pas encore été créé sur le serveur afin de permettre la suppression de contact non-synchronisé.
 
 La méthode `refresh` tente de synchroniser tous les contacts qui ne sont pas dans l'état OK avec le serveur.
 

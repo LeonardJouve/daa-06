@@ -23,7 +23,9 @@ class ContactsRepository(private val contactsDao: ContactsDao) {
     }
 
     fun softUpdateContact(contact: SyncContact) {
-        contact.status = SyncStatus.MODIFIED
+        if (contact.status != SyncStatus.CREATED) {
+            contact.status = SyncStatus.MODIFIED
+        }
         contactsDao.update(contact)
     }
 
